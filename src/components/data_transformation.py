@@ -29,28 +29,9 @@ class DataTransformation:
             numerical_cols=["carat","depth","table","x","y","z"]
 
             # Custom Ranking for ordinal variable
-            cut_map={"Fair":1,
-            "Good":2,
-            "Very Good":3,
-            "Premium":4,
-            "Ideal":5}
-
-            clarity_map={"I1":1,
-            "SI2":2,
-            "SI1":3,
-            "VS2":4,
-            "VS1":5,
-            "VVS2":6,
-            "VVS1":7,
-            "IF":8}
-
-            color_map={"D":1,
-                    "E":2,
-                    "F":3,
-                    "G":4,
-                    "H":5,
-                    "I":6,
-                    "J":7}
+            cut_map= ["Fair", "Good", "Very Good", "Premium", "Ideal"]
+            color_map = ["D", "E", "F", "G", "H", "I", "J"]
+            clarity_map = ["I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF"]
 
             logging.info("Pipeline Initiated")
             # NUmerical Pipeline
@@ -74,8 +55,8 @@ class DataTransformation:
                 ('num_pipeline',num_pipeline,numerical_cols),
                 ('cat_pipeline',cat_pipeline,categorical_cols)
             ])
-            return preprocessor
             logging.info("Pipeline Completed")
+            return preprocessor
 
         except Exception as e:
             logging.info("Error in Data Transformation")
@@ -97,24 +78,25 @@ class DataTransformation:
             drop_columns=[target_column_name,'id']
 
             input_feature_train_df=train_df.drop(columns=drop_columns,axis=1)
-            target_feature_train=train_df[target_column_name]
+            target_feature_train_df=train_df[target_column_name]
 
             input_feature_test_df=test_df.drop(columns=drop_columns,axis=1)
-            target_feature_test=test_df[target_column_name]
+            target_feature_test_df=test_df[target_column_name]
 
             # Transforming using preprocessor object
+            logging.info("Applying preprocessing object on training datasets")
             input_feature_train_array=preprocessing_obj.fit_transform(input_feature_train_df)
             input_feature_test_array=preprocessing_obj.transform(input_feature_test_df)
 
+            train_arr=np.c_[input_feature_train_array,np.array(target_feature_train_df)]
+            test_arr=np.c_[input_feature_test_array,np.array(target_feature_test_df)]
             logging.info("Applying preprocessing object on training and testing datasets")
-            train_arr=np.c_[input_feature_train_array,np.array(target_feature_train)]
-            test_arr=np.c_[input_feature_test_array,np.array(target_feature_test)]
 
             save_object(
                 file_path=self.data_transformation_config.preprocessor_obj_file_path,
                 obj=preprocessing_obj
             )
-
+            logging.info("Pipeline pkl saved")
             return(
                 train_arr,
                 test_arr,
