@@ -26,7 +26,7 @@ def evaluate_model(X_train,y_train,X_test,y_test,models):
         report={}
         for i in range(len(models)):
             model=list(models.values())[i]
-        #    Train model
+        # Train model
             model.fit(X_train,y_train)
             # Predict testing data
             y_test_pred=model.predict(X_test)
@@ -38,4 +38,12 @@ def evaluate_model(X_train,y_train,X_test,y_test,models):
         return report
     except Exception as e:
         logging.info("Exception occured in model training and evaluation")
+        raise CustomException(e,sys)
+
+def load_object(file_path):
+    try:
+        with open(file_path,"rb") as file_obj:
+            return pickle.load(file_obj)
+    except Exception as e:
+        logging.info("Exception occured in load_object util")
         raise CustomException(e,sys)
